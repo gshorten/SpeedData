@@ -25,7 +25,7 @@ int SpeedData::getSpeeduinoData(byte getData[2])
   */
   byte dataStart = getData[0];
   byte noBytes = getData[1];
-  Serial.print(dataStart); Serial.print("  "); Serial.println(noBytes);
+  
   int speedValue = 0;                 // return value
   const byte requestData = 0x72;      // the letter "r" in hex ,could send the integer or char but being consistent :-)
   const byte canID = 0x119;           // speeduino canbus ID; i don't know what this is so I picked one at random.
@@ -57,7 +57,7 @@ int SpeedData::getSpeeduinoData(byte getData[2])
       speedValue = (secondByte << 8) | firstByte;  //join high and low bytes into integer value
     }
   }
-  Serial.print(" Raw Speeduino Data: "); Serial.println(speedValue);
+  
   return speedValue;
 }
 
@@ -106,7 +106,6 @@ float SpeedData::getActualAFR(int readFreq) {
   if (millis() - lastRead > readFreq) {
     // get data
     actual = getSpeeduinoData(actualAFRData);
-    Serial.print("Actual AFR: "); Serial.println(actual);
     lastRead = millis();
     adjActual = actual / 10;		// s/b in range of 7.0 - 22.0
   }
@@ -123,7 +122,6 @@ float SpeedData::getTargetAFR (int readFreq) {
   if (millis() - lastRead > readFreq) {
     // get data
     target = getSpeeduinoData(targetAFRData);
-    Serial.print("Target AFR: "); Serial.println(target);
     lastRead = millis();
     adjTarget = target / 10;		
   }
@@ -139,8 +137,6 @@ int SpeedData::getLoops(int readFreq) {
   if (millis() - lastRead > readFreq) {
     loopsPS = getSpeeduinoData(loopsData);
     lastRead = millis();
-    Serial.print("Loops per Second: "); Serial.println(loopsPS);
-   
   }
   return loopsPS;
 }
