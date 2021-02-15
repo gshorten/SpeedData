@@ -1,0 +1,22 @@
+######################################
+# Syntax Coloring Map For SpeedData
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SpeedData	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setSerial		KEYWORD2
+getAFR			KEYWORD2
+getEGO			KEYWORD2
+getLoops		KEYWORD2
+getData			KEYWORD2
+
+
+
