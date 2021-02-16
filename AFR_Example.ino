@@ -6,7 +6,7 @@
 #include <SpeedData.h>
 
 // create SpeedData object to get data
-SpeedData SData;
+SpeedData SData(&Serial2);		// Serail 2 port
 
 // pins to use for serial2 on ESP32
 #define sTX 21
@@ -16,8 +16,6 @@ void setup() {
   Serial.begin(115200);
   // set up second serial port to connect to the Speeduino Mega 2560, pins D14 (TX3) and D15 (RX3)
   Serial2.begin(115200, SERIAL_8N1, sRX, sTX);
-  // set the serial port for SpeedData class to  use
-  SData.setSerial(&Serial2);
 }
 
 void loop() {

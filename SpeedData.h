@@ -13,9 +13,8 @@
 class SpeedData
 {
   public:
-    SpeedData();   
-	void setSerial(Stream *port);			
-	// sets the serial port to use.  example speedObject.setSerial(&Serial2);
+    SpeedData(Stream *port);   
+	// specify port with &, ie $Serial2 for Serial 2 port
 	// This would use Serial2 on the device (ie, ESP32) to request and receive data from
 	// the Speeduino Ardruino Mega.
 	

@@ -8,9 +8,9 @@
 #include <SPI.h>
 
 // Class constructor
-SpeedData::SpeedData()
+SpeedData::SpeedData(Stream *port)
 {
-  ;
+  _port = port;
 }
 
 int SpeedData::getSpeeduinoData(byte getData[2])
@@ -59,12 +59,6 @@ int SpeedData::getSpeeduinoData(byte getData[2])
   }
   
   return speedValue;
-}
-
-// setter to pont to the serial port to use.  In theory can be any type - software, hardware, bluetooth. 
-// example: speedObject.setSerial(&Serial2)   - this would be Serial2 on ESP32
-void SpeedData::setSerial(Stream *port){
-	_port = port;
 }
 
 int SpeedData::getData(byte location, byte length){
