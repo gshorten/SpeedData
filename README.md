@@ -7,4 +7,4 @@ See https://wiki.speeduino.com/en/Secondary_Serial_IO_interface
 for information on data available 
 
 Tested on an ESP32, but should work on any platform.
-Should work with any serial interface.
+Should work with any type of serial interface - hardware, software, bluetooth, etc.

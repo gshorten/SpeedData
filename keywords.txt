@@ -12,7 +12,6 @@ SpeedData	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-setSerial		KEYWORD2
 getAFR			KEYWORD2
 getEGO			KEYWORD2
 getLoops		KEYWORD2
