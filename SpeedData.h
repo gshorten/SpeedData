@@ -1,14 +1,21 @@
-/*
+/*!
+	@file SpeedData.h
+	
    Library to get data out from speeduino ECU  from another microcontroller (ESP32, etc).
    Data is sent from the Speeduino from Secondary serial interface.
    Gets AFR,EGO, and Loops per second (LPS), Also a generic function to get any data.  Documentation on secondary interface here:
    https://wiki.speeduino.com/en/Secondary_Serial_IO_interface 
 */
+
 #ifndef SpeedData_h
 #define SpeedData_h
 
 #include "Arduino.h"
 #include <SPI.h>
+
+/*!
+@brief Class to get data from the speeduino
+*/
 
 class SpeedData
 {
@@ -29,6 +36,12 @@ class SpeedData
 	
 	int getLoops(int readFreq = 200);
 	// main loops per second
+	
+	int getWarmup( int readFreq = 250);
+	// warmup enrichment
+	
+	int getMAP( int readFreq = 200);
+	// manifold air pressure
 	
 	int getData(byte location, byte length);
 	// generic function to get data.  Usually wrap this in another function that

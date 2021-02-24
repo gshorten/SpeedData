@@ -1,6 +1,20 @@
-/*
-    SpeedData.cpp - Library to get data from a speeduino secondary serial interface.
-	Tested on an ESP32.
+/*!
+    @file SpeedData.cpp
+	
+	@mainpage Library to get data from a Speeduino secondary interface using ESP32 
+	
+	@section intro_sec Introduction
+	Uses a TTGO ESP32 dev kit module with integrated TFT display, wifi, bluetooth, and two buttons.
+	Connects to the Speeduino / Arduino Serial3 and gets data from the Speeduino secondary interface.
+	Gets Air Fuel Ratio (AFR), Loops per second, and EGO correction. Also has a generic method
+	for getting any other available data.
+	
+	@section dependencies Dependencies
+	SPI.h
+	Arduino.h
+	
+	@section author Author 
+	Geoff Shorten
 */
 
 #include "Arduino.h"
@@ -67,6 +81,30 @@ int SpeedData::getData(byte location, byte length){
 	byte dataToGet[2] = {location,length};
 	long sData = getSpeeduinoData(dataToGet);
 	return sData;
+}
+
+int SpeedData::getWarmup(int readFreq ){
+	// get warmup enrichment
+	byte warmupData[2] = {13,1};
+	static long warmup;
+
+  if (millis() - lastRead > readFreq) {
+    warmup = getSpeeduinoData(warmupData);
+	//Serial.print("Warmup: "); Serial.println(warmup);
+  }
+  return warmup;
+}
+
+int SpeedData::getMAP(int readFreq ){
+	// get manifold air pressure (MAP)
+	byte MAPData[2] = {4,2};
+	static long map;
+
+  if (millis() - lastRead > readFreq) {
+    map = getSpeeduinoData(MAPData);
+	//Serial.print("Warmup: "); Serial.println(warmup);
+  }
+  return map;
 }
 
 int SpeedData::getEGO(int readFreq) {
