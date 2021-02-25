@@ -87,6 +87,7 @@ int SpeedData::getWarmup(int readFreq ){
 	// get warmup enrichment
 	byte warmupData[2] = {13,1};
 	static long warmup;
+	static long lastRead = millis() - 100;
 
   if (millis() - lastRead > readFreq) {
     warmup = getSpeeduinoData(warmupData);
@@ -99,6 +100,7 @@ int SpeedData::getMAP(int readFreq ){
 	// get manifold air pressure (MAP)
 	byte MAPData[2] = {4,2};
 	static long map;
+	static long lastRead = millis() - 100;
 
   if (millis() - lastRead > readFreq) {
     map = getSpeeduinoData(MAPData);
