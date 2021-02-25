@@ -70,8 +70,7 @@ int SpeedData::getSpeeduinoData(byte getData[2])
       byte secondByte = _port->read();
       speedValue = (secondByte << 8) | firstByte;  //join high and low bytes into integer value
     }
-  }
-  
+  } 
   return speedValue;
 }
 
@@ -94,6 +93,32 @@ int SpeedData::getWarmup(int readFreq ){
 	//Serial.print("Warmup: "); Serial.println(warmup);
   }
   return warmup;
+}
+
+int SpeedData::getGammaE(int readFreq ){
+	// get total enrichment (Gamma), as percent.  
+	byte gammaEData[2] = {17,1};
+	static long gammaE;
+	static long lastRead = millis() - 100;
+
+  if (millis() - lastRead > readFreq) {
+    gammaE = getSpeeduinoData(gammaEData);
+	//Serial.print("GammaE: "); Serial.println(GammaE);
+  }
+  return gammaE;
+}
+
+int SpeedData::getAccelEnrich(int readFreq ){
+	// get Acceleration enrichment, as percent.  
+	byte accelEnrichData[2] = {16,1};
+	static long accelEnrich;
+	static long lastRead = millis() - 100;
+
+  if (millis() - lastRead > readFreq) {
+    accelEnrich = getSpeeduinoData(accelEnrichData);
+	//Serial.print("Acceleration enrichment: "); Serial.println(accelEnrich);
+  }
+  return accelEnrich;
 }
 
 int SpeedData::getMAP(int readFreq ){

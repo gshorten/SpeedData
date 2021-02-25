@@ -20,10 +20,14 @@
 class SpeedData
 {
   public:
-    SpeedData(Stream *port);   
-	// specify port with &, ie $Serial2 for Serial 2 port
+    SpeedData(Stream *port);   // constructor
+	// specify port with &, ie &Serial2 for Serial 2 port
 	// This would use Serial2 on the device (ie, ESP32) to request and receive data from
 	// the Speeduino Ardruino Mega.
+	
+	
+	// Methods to get data.  These should be in the main loop or a function called from the main loop.
+	// readFreq parameter is in millis, it sets how often the return variable is updated.
 	
 	int getEGO(int readFreq = 50);
 	// EGO adjustment, range is 85 - 115. Corresponds to Speeduino max range of +-15%
@@ -38,10 +42,16 @@ class SpeedData
 	// main loops per second
 	
 	int getWarmup( int readFreq = 250);
-	// warmup enrichment
+	// warmup enrichment, %
 	
 	int getMAP( int readFreq = 200);
 	// manifold air pressure
+	
+	int getGammaE (int readFreq = 150);
+	// total enrichment adjustments % - cold start, warmup, IAT, etc.
+	
+	int getAccelEnrich ( int readFreq = 100);
+	// acceleration enrichment %
 	
 	int getData(byte location, byte length);
 	// generic function to get data.  Usually wrap this in another function that
