@@ -25,7 +25,7 @@ class SpeedData
 	// This would use Serial2 on the device (ie, ESP32) to request and receive data from
 	// the Speeduino Ardruino Mega.
 	
-	
+
 	// Methods to get data.  These should be in the main loop or a function called from the main loop.
 	// readFreq parameter is in millis, it sets how often the return variable is updated.
 	
@@ -57,8 +57,6 @@ class SpeedData
 	// generic function to get data.  Usually wrap this in another function that
 	// will set how often to get the data and any data conversion required.
 	
-	
-
   private:
 	Stream *_port;     				
 	// Serial port to use on requesting device (ie, ESP32 would be Serial2)
