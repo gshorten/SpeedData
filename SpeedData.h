@@ -29,33 +29,35 @@ class SpeedData
 	// Methods to get data.  These should be in the main loop or a function called from the main loop.
 	// readFreq parameter is in millis, it sets how often the return variable is updated.
 	
-	int getEGO(int readFreq = 50);
+	int getEGO(int freq = 100);
 	// EGO adjustment, range is 85 - 115. Corresponds to Speeduino max range of +-15%
 	
-	float getActualAFR(int readFreq = 100);
+	float getActualAFR(int freq = 100);
 	// actual air fuel ratio
 	
-	float getTargetAFR(int readFreq = 100);
+	float getTargetAFR(int freq = 100);
 	// target air fuel ratio
 	
-	int getLoops(int readFreq = 200);
+	int getLoops(int freq = 200);
 	// main loops per second
 	
-	int getWarmup( int readFreq = 250);
+	int getWarmup(int freq = 250);
 	// warmup enrichment, %
 	
-	int getMAP( int readFreq = 200);
+	int getMAP(int freq = 200);
 	// manifold air pressure
 	
-	int getGammaE (int readFreq = 150);
+	int getGammaE (int freq = 200);
 	// total enrichment adjustments % - cold start, warmup, IAT, etc.
 	
-	int getAccelEnrich ( int readFreq = 100);
+	int getAccelEnrich (int freq = 100);
 	// acceleration enrichment %
 	
 	int getData(byte location, byte length);
 	// generic function to get data.  Usually wrap this in another function that
 	// will set how often to get the data and any data conversion required.
+	
+	
 
   private:
 	Stream *_port;     				
@@ -63,6 +65,7 @@ class SpeedData
     
 	int getSpeeduinoData(byte getData[2]);
 	//method that gets the data from the speeduino.
+		
 };
 
 #endif

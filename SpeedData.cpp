@@ -40,16 +40,16 @@ int SpeedData::getSpeeduinoData(byte getData[2])
   byte dataStart = getData[0];
   byte noBytes = getData[1];
   
-  int speedValue = 0;                 // return value
-  const byte requestData = 0x72;      // the letter "r" in hex ,could send the integer or char but being consistent :-)
-  const byte canID = 0x119;           // speeduino canbus ID; i don't know what this is so I picked one at random.
+  int speedValue = 0;                 	// return value
+  const byte requestData = 0x72;      	// the letter "r" in hex ,could send the integer or char but being consistent :-)
+  const byte canID = 0x119;           	// speeduino canbus ID; i don't know what this is so I picked one at random.
   // we are not using canbus but Speeduino expects it 
-  const byte rCommand = 0x30;         // "r" type command
+  const byte rCommand = 0x30;         	// "r" type command
 
   // make two byte hex values to send to speeduino
-  byte startLSB = lowByte(dataStart);   // high and low bytes for start and length of data sequence
+  byte startLSB = lowByte(dataStart);   		// high and low bytes for start and length of data sequence
   byte startMSB = highByte(dataStart);
-  byte lengthLSB = lowByte(noBytes);    // high ansd low bytes for length of data
+  byte lengthLSB = lowByte(noBytes);    	// high ansd low bytes for length of data
   byte lengthMSB = highByte(noBytes);
 
   // make an array of the bytes to send to start transmission of the data
@@ -58,8 +58,8 @@ int SpeedData::getSpeeduinoData(byte getData[2])
   byte firstByte = _port->read();
   if (firstByte == 0x72)                  // 0x72 is confirmation, we apparently have data back, so process it
   {
-    _port->read();            //next byte in buffer should be the data type confirmation. ignore for now
-    if (noBytes == 1)       // if there is supposed to only be one byte then do another read and save the value
+    _port->read();            			//next byte in buffer should be the data type confirmation. ignore for now
+    if (noBytes == 1)       			// if there is supposed to only be one byte then do another read and save the value
     {
       speedValue = _port->read();
     }
@@ -82,59 +82,59 @@ int SpeedData::getData(byte location, byte length){
 	return sData;
 }
 
-int SpeedData::getWarmup(int readFreq ){
+int SpeedData::getWarmup(int freq){
 	// get warmup enrichment
 	byte warmupData[2] = {13,1};
 	static long warmup;
 	static long lastRead = millis() - 100;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     warmup = getSpeeduinoData(warmupData);
 	//Serial.print("Warmup: "); Serial.println(warmup);
   }
   return warmup;
 }
 
-int SpeedData::getGammaE(int readFreq ){
+int SpeedData::getGammaE(int freq){
 	// get total enrichment (Gamma), as percent.  
 	byte gammaEData[2] = {17,1};
 	static long gammaE;
 	static long lastRead = millis() - 100;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     gammaE = getSpeeduinoData(gammaEData);
 	//Serial.print("GammaE: "); Serial.println(GammaE);
   }
   return gammaE;
 }
 
-int SpeedData::getAccelEnrich(int readFreq ){
+int SpeedData::getAccelEnrich(int freq){
 	// get Acceleration enrichment, as percent.  
 	byte accelEnrichData[2] = {16,1};
 	static long accelEnrich;
 	static long lastRead = millis() - 100;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     accelEnrich = getSpeeduinoData(accelEnrichData);
 	//Serial.print("Acceleration enrichment: "); Serial.println(accelEnrich);
   }
   return accelEnrich;
 }
 
-int SpeedData::getMAP(int readFreq ){
+int SpeedData::getMAP(int freq){
 	// get manifold air pressure (MAP)
 	byte MAPData[2] = {4,2};
 	static long map;
 	static long lastRead = millis() - 100;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     map = getSpeeduinoData(MAPData);
 	//Serial.print("Warmup: "); Serial.println(warmup);
   }
   return map;
 }
 
-int SpeedData::getEGO(int readFreq) {
+int SpeedData::getEGO(int freq) {
   /*
    Get the EGO correction.
    100 is no correction, correction is +- from this.  max correction in Speeduino is +- 15%,
@@ -147,7 +147,7 @@ int SpeedData::getEGO(int readFreq) {
   static long lastRead = millis() - 100;
   static long EGO;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     EGO = getSpeeduinoData(egoData);
     lastRead = millis();
     Serial.print("EGO: "); Serial.println(EGO);
@@ -155,14 +155,14 @@ int SpeedData::getEGO(int readFreq) {
   return EGO;
 }
 
-float SpeedData::getActualAFR(int readFreq) {
+float SpeedData::getActualAFR(int freq) {
   // get actual Air Fuel Ratio (AFR)
   byte actualAFRData[2] = {10, 1};
   static long lastRead = millis();
   float actual;
   static float adjActual;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     // get data
     actual = getSpeeduinoData(actualAFRData);
     lastRead = millis();
@@ -171,14 +171,14 @@ float SpeedData::getActualAFR(int readFreq) {
   return adjActual;
 }
 
-float SpeedData::getTargetAFR (int readFreq) {
+float SpeedData::getTargetAFR (int freq) {
   // get target AFR
   byte targetAFRData[2] = {19, 1};
   static long lastRead = millis();
   float target;
   static float adjTarget;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     // get data
     target = getSpeeduinoData(targetAFRData);
     lastRead = millis();
@@ -187,17 +187,19 @@ float SpeedData::getTargetAFR (int readFreq) {
   return adjTarget;
 }
 
-int SpeedData::getLoops(int readFreq) {
+int SpeedData::getLoops(int freq) {
   // get Speeduino main loops per second . Typically for Speeduino this is ~1100
   byte loopsData[2] = {25,2};          
   static long lastRead = millis();
   static int loopsPS = 1000;
 
-  if (millis() - lastRead > readFreq) {
+  if (millis() - lastRead > freq) {
     loopsPS = getSpeeduinoData(loopsData);
     lastRead = millis();
   }
   return loopsPS;
 }
+
+
 
 
