@@ -39,38 +39,47 @@ int SpeedData::getSpeeduinoData(byte getData[2])
   */
   byte dataStart = getData[0];
   byte noBytes = getData[1];
-  
   int speedValue = 0;                 	// return value
-  const byte requestData = 0x72;      	// the letter "r" in hex ,could send the integer or char but being consistent :-)
-  const byte canID = 0x119;           	// speeduino canbus ID; i don't know what this is so I picked one at random.
-  // we are not using canbus but Speeduino expects it 
-  const byte rCommand = 0x30;         	// "r" type command
+  
+  if (testMode){
+	  // we are in test mode, return fake data
+	  speedValue = getFakeData(dataStart,.1);
+  }
+  
+  else {
+	  // not in test mode, get real data  
+	  const byte requestData = 0x72;      	// the letter "r" in hex ,could send the integer or char but being consistent :-)
+	  const byte canID = 0x119;           	// speeduino canbus ID; i don't know what this is so I picked one at random.
+	  // we are not using canbus but Speeduino expects it 
+	  const byte rCommand = 0x30;         	// "r" type command
 
-  // make two byte hex values to send to speeduino
-  byte startLSB = lowByte(dataStart);   		// high and low bytes for start and length of data sequence
-  byte startMSB = highByte(dataStart);
-  byte lengthLSB = lowByte(noBytes);    	// high ansd low bytes for length of data
-  byte lengthMSB = highByte(noBytes);
+	  // make two byte hex values to send to speeduino
+	  byte startLSB = lowByte(dataStart);   		// high and low bytes for start and length of data sequence
+	  byte startMSB = highByte(dataStart);
+	  byte lengthLSB = lowByte(noBytes);    	// high ansd low bytes for length of data
+	  byte lengthMSB = highByte(noBytes);
 
-  // make an array of the bytes to send to start transmission of the data
-  byte sendSequence[] = {requestData, canID, rCommand, startLSB, startMSB, lengthLSB, lengthMSB};
-  _port ->write(sendSequence, 7);          // send the sequence to the arduino
-  byte firstByte = _port->read();
-  if (firstByte == 0x72)                  // 0x72 is confirmation, we apparently have data back, so process it
-  {
-    _port->read();            			//next byte in buffer should be the data type confirmation. ignore for now
-    if (noBytes == 1)       			// if there is supposed to only be one byte then do another read and save the value
-    {
-      speedValue = _port->read();
-    }
-    else if (noBytes == 2)
-    { 
-      // there are two bytes of data so have to do two reads and join the bytes into an integer
-      byte firstByte = _port->read();
-      byte secondByte = _port->read();
-      speedValue = (secondByte << 8) | firstByte;  //join high and low bytes into integer value
-    }
-  } 
+	  // make an array of the bytes to send to start transmission of the data
+	  byte sendSequence[] = {requestData, canID, rCommand, startLSB, startMSB, lengthLSB, lengthMSB};
+	  _port ->write(sendSequence, 7);          // send the sequence to the arduino
+	  delay(50);								// try waiting for response
+	  byte firstByte = _port->read();
+	  if (firstByte == 0x72)                  // 0x72 is confirmation, we apparently have data back, so process it
+	  {
+		_port->read();            			//next byte in buffer should be the data type confirmation. ignore for now
+		if (noBytes == 1)       			// if there is supposed to only be one byte then do another read and save the value
+		{
+		  speedValue = _port->read();
+		}
+		else if (noBytes == 2)
+		{ 
+		  // there are two bytes of data so have to do two reads and join the bytes into an integer
+		  byte firstByte = _port->read();
+		  byte secondByte = _port->read();
+		  speedValue = (secondByte << 8) | firstByte;  //join high and low bytes into integer value
+		}
+	  } 
+	}
   return speedValue;
 }
 
@@ -200,6 +209,89 @@ int SpeedData::getLoops(int freq) {
   return loopsPS;
 }
 
+void SpeedData::testModeOn(){
+	testMode = true;
+}
 
+void SpeedData::testModeOff(){
+	testMode = false;
+}	
 
+	
+int SpeedData::getFakeData(byte retType, float inc){
+	// generates  fake speeduino values along a sine curve  in range appropriate for type of data expected
+	int min;
+	int max;
+	
+	// set range for data returned
+	switch (retType) {
+		case 4:
+			// MAP
+			min = 0;
+			max = 110;
+			break;
+		case 10:
+			//afr
+			min = fakeAfrMin;
+			max = fakeAfrMax;
+			break;
+		case 11:
+			// EGO correction
+			min = 75;
+			max = 200;
+			break;
+		case 13:
+			// warmup adder
+			min = 100;
+			max = 200;
+			break;
+		case 16:
+			// Acceleration enrichment
+			min = 100;
+			max = 200;
+			break;
+		case 17:
+			// GammaE, total adder to vector
+			min = 100;
+			max = 200;
+			break;
+		case 25:
+			// loops per second
+			min = 1000;
+			max = 1400;
+			break;
+		default :
+			// AFR;  to get afr divide by 10, so define max min as  your normal values X10
+			min = 80;
+			max = 220;
+			break;
+	}
+			
+	static float d = 0;
+    d += inc; 
+	if (d >= 360) { d = inc; }
+	float valueRange = (max - min)/2;
+    // generate a number in the desired range
+    int value = int(round(sin(d) * valueRange) + (valueRange + min ));
+	// constrain if its out of range
+	value = constrain(value,min,max);
+		
+   return value;
+}
 
+void SpeedData::setFakeAFR(byte afrMin, byte afrMax){
+	// sets afr range to generate
+	if (afrMin > afrMax){
+		//afrMin must be smaller than afrMax
+		//#error afrMin must be smaller than afrMax, resetting to defaults!
+		// reset to defaults
+		fakeAfrMin = 120;
+		fakeAfrMax = 180;
+	}
+	else {
+		fakeAfrMin = afrMin;
+		fakeAfrMax = afrMax;
+	}
+	// add other error checks here for afr range
+}
+		
