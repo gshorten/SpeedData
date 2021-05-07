@@ -91,6 +91,19 @@ int SpeedData::getData(byte location, byte length){
 	return sData;
 }
 
+int SpeedData::getRPM(int freq){
+	// get rpm
+	byte rpmData[2] = {14,2};
+	static long rpm;
+	static long lastRead = millis() - 100;
+
+	if (millis() - lastRead > freq) {
+		rpm = getSpeeduinoData(rpmData);
+		//Serial.print("Warmup: "); Serial.println(warmup);
+	}
+	return rpm;
+}
+
 int SpeedData::getWarmup(int freq){
 	// get warmup enrichment
 	byte warmupData[2] = {13,1};
@@ -245,6 +258,11 @@ int SpeedData::getFakeData(byte retType, float inc){
 			min = 100;
 			max = 200;
 			break;
+		case 14:
+			// rpm 
+			min = 0;
+			max = 10000;
+			break;
 		case 16:
 			// Acceleration enrichment
 			min = 100;
@@ -254,6 +272,11 @@ int SpeedData::getFakeData(byte retType, float inc){
 			// GammaE, total adder to vector
 			min = 100;
 			max = 200;
+			break;
+		case 23:
+			// spark advance
+			min = 0;
+			max = 45;
 			break;
 		case 25:
 			// loops per second
@@ -285,8 +308,8 @@ void SpeedData::setFakeAFR(byte afrMin, byte afrMax){
 		//afrMin must be smaller than afrMax
 		//#error afrMin must be smaller than afrMax, resetting to defaults!
 		// reset to defaults
-		fakeAfrMin = 120;
-		fakeAfrMax = 180;
+		fakeAfrMin = 100;
+		fakeAfrMax = 220;
 	}
 	else {
 		fakeAfrMin = afrMin;
