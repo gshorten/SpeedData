@@ -78,9 +78,13 @@ int SpeedData::getSpeeduinoData(byte getData[2])
 		  byte secondByte = _port->read();
 		  speedValue = (secondByte << 8) | firstByte;  //join high and low bytes into integer value
 		}
-	  } 
-	}
-  return speedValue;
+	  }
+	  else 
+		{
+		  speedValue = 0;
+		}
+  }
+	return speedValue;
 }
 
 int SpeedData::getData(byte location, byte length){
@@ -91,17 +95,69 @@ int SpeedData::getData(byte location, byte length){
 	return sData;
 }
 
-int SpeedData::getRPM(int freq){
+long SpeedData::getRPM(int freq){
 	// get rpm
 	byte rpmData[2] = {14,2};
 	static long rpm;
 	static long lastRead = millis() - 100;
 
 	if (millis() - lastRead > freq) {
-		rpm = getSpeeduinoData(rpmData);
-		//Serial.print("Warmup: "); Serial.println(warmup);
+		rpm = getSpeeduinoData(rpmData) / 4;
+		lastRead = millis();
 	}
 	return rpm;
+}
+
+float SpeedData::getBattVoltage(int freq){
+	// get battery voltage
+	byte voltData[2] = {9,1};
+	static float bVolt;
+	static long lastRead = millis() - 100;
+
+	if (millis() - lastRead > freq) {
+		bVolt = getSpeeduinoData(voltData) / 10;
+		lastRead = millis();
+	}
+	return bVolt;
+}
+
+int SpeedData::getWaterTemp(int freq){
+	// get rpm
+	byte waterTempData[2] = {7,1};
+	static long waterTemp;
+	static long lastRead = millis() - 100;
+	static boolean firstRead = true;
+	
+
+	if (millis() - lastRead > freq) {
+		int temp = getSpeeduinoData(waterTempData) - 40;			// range from speeduino is 0 - 255, subtract 40 to get degrees c
+		waterTemp = (temp * 1.8) + 32;			// water temp in f.  
+		// TODO add a setter to switch between celsius and farenheight
+		// check to see if temperature change is reasonable, otherwise it is noise
+		//if (firstRead){
+			//waterTemp = temp;
+			//firstRead = false;
+		//}
+		//if (abs(temp - waterTemp) < 30){
+			//waterTemp = temp;
+			//lastRead = millis();
+		//}
+	}
+	return waterTemp;
+}
+
+int SpeedData::getTPS(int freq){
+	// get rpm
+	byte bytesToGet[2] = {24,1};
+	static int tps = 0;
+	static long lastRead = millis() - 100;
+
+	if (millis() - lastRead > freq) {
+		tps = getSpeeduinoData(bytesToGet);
+		//tps = map(tps,0,255,0,100);		// convert tps reading into 0 - 100%
+		lastRead = millis();
+	}
+	return tps;
 }
 
 int SpeedData::getWarmup(int freq){
@@ -112,6 +168,7 @@ int SpeedData::getWarmup(int freq){
 
   if (millis() - lastRead > freq) {
     warmup = getSpeeduinoData(warmupData);
+	lastRead = millis();
 	//Serial.print("Warmup: "); Serial.println(warmup);
   }
   return warmup;
@@ -125,6 +182,7 @@ int SpeedData::getGammaE(int freq){
 
   if (millis() - lastRead > freq) {
     gammaE = getSpeeduinoData(gammaEData);
+	lastRead = millis();
 	//Serial.print("GammaE: "); Serial.println(GammaE);
   }
   return gammaE;
@@ -138,6 +196,7 @@ int SpeedData::getAccelEnrich(int freq){
 
   if (millis() - lastRead > freq) {
     accelEnrich = getSpeeduinoData(accelEnrichData);
+	lastRead = millis();
 	//Serial.print("Acceleration enrichment: "); Serial.println(accelEnrich);
   }
   return accelEnrich;
@@ -151,6 +210,7 @@ int SpeedData::getMAP(int freq){
 
   if (millis() - lastRead > freq) {
     map = getSpeeduinoData(MAPData);
+	lastRead = millis();
 	//Serial.print("Warmup: "); Serial.println(warmup);
   }
   return map;
@@ -243,6 +303,16 @@ int SpeedData::getFakeData(byte retType, float inc){
 			min = 0;
 			max = 110;
 			break;
+		case 7:
+			// water temperature
+			min = 0;
+			max = 160;
+			break;
+		case 9:
+			// battery voltage
+			min = 0;
+			max = 160;
+			break;
 		case 10:
 			//afr
 			min = fakeAfrMin;
@@ -270,8 +340,13 @@ int SpeedData::getFakeData(byte retType, float inc){
 			break;
 		case 17:
 			// GammaE, total adder to vector
-			min = 100;
-			max = 200;
+			min = 75;
+			max = 175;
+			break;
+		case 22:
+			// throttle position (TPS)
+			min = 0;
+			max =100;
 			break;
 		case 23:
 			// spark advance
@@ -289,12 +364,13 @@ int SpeedData::getFakeData(byte retType, float inc){
 			max = 220;
 			break;
 	}
-			
+	
+	// generate sin curve to simulate fake data
 	static float d = 0;
     d += inc; 
 	if (d >= 360) { d = inc; }
 	float valueRange = (max - min)/2;
-    // generate a number in the desired range
+    // generate a number in the desired range using the sin value from above
     int value = int(round(sin(d) * valueRange) + (valueRange + min ));
 	// constrain if its out of range
 	value = constrain(value,min,max);

@@ -28,8 +28,17 @@ class SpeedData
 	// Methods to get data.  These should be in the main loop or a function called from the main loop.
 	// readFreq parameter is in millis, it sets how often the return variable is updated.
 	
-	int getRPM(int freq = 100);
+	long getRPM(int freq = 250);
 	// rpm
+	
+	float getBattVoltage(int freq = 500);
+	// battery voltage
+	
+	int getWaterTemp(int freq = 1000);
+	// water temperature
+	
+	int getTPS(int freq = 250);
+	// get throttle position (TPS)
 	
 	int getEGO(int freq = 100);
 	// EGO adjustment, range is 85 - 115. Corresponds to Speeduino max range of +-15%
@@ -84,8 +93,8 @@ class SpeedData
 	int getFakeData(byte retType, float inc);
 	// generates sequential sine curve data - ie, simulated, fake data
 	
-	byte fakeAfrMin = 100;
-	byte fakeAfrMax = 220;
+	byte fakeAfrMin = 110;
+	byte fakeAfrMax = 185;
 	// global variable for simulated afr data range.  
 		
 };
