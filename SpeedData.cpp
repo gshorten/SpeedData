@@ -146,6 +146,31 @@ int SpeedData::getWaterTemp(int freq){
 	return waterTemp;
 }
 
+int SpeedData::getIAT(int freq){
+	// get rpm
+	byte IATData[2] = {6,1};
+	static long IATTemp;
+	static long lastRead = millis() - 100;
+	static boolean firstRead = true;
+	
+
+	if (millis() - lastRead > freq) {
+		int temp = getSpeeduinoData(IATData) - 40;			// range from speeduino is 0 - 255, subtract 40 to get degrees c
+		IATTemp = (temp * 1.8) + 32;			// water temp in f.  
+		// TODO add a setter to switch between celsius and farenheight
+		// check to see if temperature change is reasonable, otherwise it is noise
+		//if (firstRead){
+			//waterTemp = temp;
+			//firstRead = false;
+		//}
+		//if (abs(temp - waterTemp) < 30){
+			//waterTemp = temp;
+			//lastRead = millis();
+		//}
+	}
+	return IATTemp;
+}
+
 int SpeedData::getTPS(int freq){
 	// get rpm
 	byte bytesToGet[2] = {24,1};

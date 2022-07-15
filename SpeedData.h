@@ -64,6 +64,9 @@ class SpeedData
 	int getAccelEnrich (int freq = 250);
 	// acceleration enrichment %
 	
+	int getIAT (int freq = 250);
+	// get Intake air temperature (IAT)
+	
 	int getData(byte location, byte length);
 	// generic function to get data.  Usually wrap this in another function that
 	// will set how often to get the data and any data conversion required.
