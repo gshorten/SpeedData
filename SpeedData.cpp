@@ -102,7 +102,7 @@ long SpeedData::getRPM(int freq){
 	static long lastRead = millis() - 100;
 
 	if (millis() - lastRead > freq) {
-		rpm = getSpeeduinoData(rpmData) / 4;
+		rpm = getSpeeduinoData(rpmData);
 		lastRead = millis();
 	}
 	return rpm;
